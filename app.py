@@ -178,7 +178,7 @@ st.markdown(
             background: var(--soft);
             border: 1px solid var(--line);
             border-radius: 18px;
-            padding: 1rem 1.25rem .35rem;
+            padding: 1rem 1.25rem .3rem;
             margin-top: .7rem;
         }
 
@@ -245,8 +245,8 @@ st.markdown(
 
         .guide-text {
             color: var(--body);
-            font-size: .82rem;
-            line-height: 1.62;
+            font-size: .84rem;
+            line-height: 1.58;
         }
 
         .empty-result {
@@ -411,7 +411,7 @@ st.markdown(
 
         [data-testid="stImage"] img {
             width: 100%;
-            max-height: 570px;
+            max-height: 610px;
             object-fit: contain;
             background: #eee7dc;
             border: 1px solid var(--line);
@@ -513,44 +513,57 @@ def safe_text(value: object) -> str:
 
 
 def guidance_html(guidance: dict) -> str:
+    """
+    Construye el panel como una sola cadena HTML sin sangría inicial.
+    De esta manera Streamlit lo interpreta como HTML y no como un bloque de código.
+    """
     sections = [
-        ("Descripción de la enfermedad", guidance["descripcion"]),
-        ("Diferenciación a simple vista", guidance["diferenciacion_visual"]),
-        ("Manejo preventivo y correctivo", guidance["manejo_preventivo"]),
-        ("Buenas prácticas del cultivo", guidance["buenas_practicas"]),
-        ("Monitoreo y seguimiento", guidance["seguimiento"]),
-        ("Consulta a un técnico", guidance["alerta_tecnica"]),
+        (
+            "Diferenciación a simple vista",
+            guidance["diferenciacion_visual"],
+        ),
+        (
+            "Manejo agronómico preventivo y correctivo",
+            guidance["manejo_preventivo"],
+        ),
+        (
+            "Consulta a un técnico",
+            guidance["alerta_tecnica"],
+        ),
+        (
+            "Monitoreo y seguimiento",
+            guidance["seguimiento"],
+        ),
+        (
+            "Buenas prácticas y trazabilidad",
+            guidance["buenas_practicas"],
+        ),
     ]
 
-    rows = []
+    parts = [
+        '<div class="orientation-panel">',
+        '<div class="orientation-heading">',
+        '<span class="orientation-icon">!</span>',
+        "Orientación y manejo preventivo",
+        "</div>",
+        f'<div class="orientation-intro">{safe_text(guidance["descripcion"])}</div>',
+    ]
 
     for index, (title, text) in enumerate(sections, start=1):
-        rows.append(
-            f"""
-            <div class="guide-row">
-                <div class="guide-badge">{index:02d}</div>
-                <div>
-                    <div class="guide-title">{safe_text(title)}</div>
-                    <div class="guide-text">{safe_text(text)}</div>
-                </div>
-            </div>
-            """
+        parts.extend(
+            [
+                '<div class="guide-row">',
+                f'<div class="guide-badge">{index:02d}</div>',
+                "<div>",
+                f'<div class="guide-title">{safe_text(title)}</div>',
+                f'<div class="guide-text">{safe_text(text)}</div>',
+                "</div>",
+                "</div>",
+            ]
         )
 
-    return (
-        """
-        <div class="orientation-panel">
-            <div class="orientation-heading">
-                <span class="orientation-icon">!</span>
-                Orientación y manejo preventivo
-            </div>
-            <div class="orientation-intro">
-                Orientación técnica generada automáticamente mediante la API de Groq:
-            </div>
-        """
-        + "".join(rows)
-        + "</div>"
-    )
+    parts.append("</div>")
+    return "".join(parts)
 
 
 def history_html(history: list[dict]) -> str:
@@ -561,27 +574,27 @@ def history_html(history: list[dict]) -> str:
             "</div>"
         )
 
-    rows = []
+    parts = []
 
     for item in history:
         readable_time = datetime.fromisoformat(item["timestamp"]).strftime(
             "%d/%m/%Y %H:%M"
         )
 
-        rows.append(
-            f"""
-            <div class="history-row">
-                <span class="history-main">
-                    <span class="history-dot"></span>
-                    <b>{safe_text(item["display_name"])}</b>
-                    · {item["confidence"]:.1f}%
-                </span>
-                <span class="history-time">{readable_time}</span>
-            </div>
-            """
+        parts.extend(
+            [
+                '<div class="history-row">',
+                '<span class="history-main">',
+                '<span class="history-dot"></span>',
+                f'<b>{safe_text(item["display_name"])}</b>',
+                f' · {item["confidence"]:.1f}%',
+                "</span>",
+                f'<span class="history-time">{readable_time}</span>',
+                "</div>",
+            ]
         )
 
-    return "".join(rows)
+    return "".join(parts)
 
 
 if "last_result" not in st.session_state:
