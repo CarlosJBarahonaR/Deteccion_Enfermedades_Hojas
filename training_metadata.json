@@ -1,0 +1,24 @@
+{
+  "created_at_utc": "2026-08-06T01:50:45.473933+00:00",
+  "tensorflow_version": "2.16.1",
+  "image_size": [
+    224,
+    224
+  ],
+  "class_names": [
+    "Minador",
+    "Phoma",
+    "Roya",
+    "Sana"
+  ],
+  "image_counts": {
+    "Roya": 400,
+    "Phoma": 500,
+    "Minador": 500,
+    "Sana": 400
+  },
+  "validation_accuracy": 0.9305555820465088,
+  "validation_loss": 0.2150477021932602,
+  "seed": 42,
+  "architecture": "MobileNetV2 transfer learning"
+}
